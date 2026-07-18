@@ -2,17 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Logo from "@/components/Logo";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { publicText, type Locale } from "@/lib/locale";
 
-const navItems = [
-  { label: "HOME", href: "/#home" },
-  { label: "Visual Stories", href: "/#visual-stories" },
-  { label: "Expressions", href: "/#expressions" },
-  { label: "Behind the Canvas", href: "/#behind-the-canvas" },
-  { label: "Say Hello", href: "/#say-hello" },
-];
-
-export default function Header() {
+export default function Header({ locale = "en" }: { locale?: Locale }) {
   const [open, setOpen] = useState(false);
+  const copy = publicText[locale].nav;
+  const navItems = [
+    { label: copy.home, href: "/#home" },
+    { label: copy.stories, href: "/#visual-stories" },
+    { label: copy.expressions, href: "/#expressions" },
+    { label: copy.behind, href: "/#behind-the-canvas" },
+    { label: copy.hello, href: "/#say-hello" },
+  ];
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -24,13 +26,22 @@ export default function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-line bg-white">
       {/* Barra superior negra con correo */}
-      <div className="flex h-8 items-center justify-center bg-ink px-5 sm:px-8">
+      <div className="relative flex h-8 items-center justify-start bg-ink px-5 sm:justify-center sm:px-8">
         <a
           href="mailto:ikkoastudio@gmail.com"
-          className="font-[family-name:var(--font-nav)] text-[11px] tracking-[0.14em] text-white transition-opacity hover:opacity-70 sm:text-xs"
+          className="mr-32 truncate font-[family-name:var(--font-nav)] text-[11px] tracking-[0.14em] text-white transition-opacity hover:opacity-70 sm:mr-0 sm:text-xs"
         >
           ikkoastudio@gmail.com
         </a>
+        <div className="absolute right-5 flex items-center gap-3 sm:right-8">
+          <LanguageSwitcher locale={locale} />
+          <a
+            href="/login"
+            className="font-[family-name:var(--font-nav)] text-[10px] uppercase tracking-[0.12em] text-white transition-opacity hover:opacity-70 sm:text-xs"
+          >
+            {copy.login}
+          </a>
+        </div>
       </div>
 
       {/* Fila del logo, centrado */}
@@ -46,7 +57,7 @@ export default function Header() {
 
         <button
           type="button"
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? copy.closeMenu : copy.openMenu}
           aria-expanded={open}
           className="absolute right-5 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 items-center justify-center lg:hidden"
           onClick={() => setOpen((v) => !v)}

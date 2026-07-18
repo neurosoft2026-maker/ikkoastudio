@@ -16,10 +16,14 @@ npm run dev
 
 Abre [http://localhost:3000](http://localhost:3000).
 
-## Secciones
+## Supabase
 
-- **HOME** — hero con marca ikkoa
-- **Visual Stories** — obras seleccionadas
-- **Expressions** — manifiesto artístico
-- **Behind the Canvas** — el proceso en el estudio
-- **Say Hello** — contacto
+1. Crea un proyecto en [supabase.com](https://supabase.com/dashboard).
+2. Copia `.env.example` a `.env.local` y pega **Project URL** y **anon public** key (Settings → API).
+3. En el SQL Editor, ejecuta `supabase/schema.sql` para crear las tablas.
+4. Reinicia `npm run dev`.
+
+Clientes listos en:
+- `src/lib/supabase/client.ts` — navegador
+- `src/lib/supabase/server.ts` — Server Components / Route Handlers
+- `src/middleware.ts` — refresco de sesión

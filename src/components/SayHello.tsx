@@ -1,54 +1,51 @@
 "use client";
 
 import { useState } from "react";
+import { STUDIO_CONTACTS, whatsappUrl } from "@/lib/contacts";
+import { publicText, type Locale } from "@/lib/locale";
 
 type Channel = "email" | "whatsapp" | "social";
 
-const CONTACTS = {
-  email: "ikkoastudio@gmail.com",
-  whatsapp: "+573000000000",
-  whatsappDisplay: "+57 300 000 0000",
-  instagram: "ikkoastudio",
-  instagramUrl: "https://instagram.com/ikkoastudio",
-};
-
-const options: { id: Channel; label: string }[] = [
-  { id: "email", label: "Email" },
-  { id: "whatsapp", label: "WhatsApp" },
-  { id: "social", label: "Social media" },
-];
-
-function replyFor(channel: Channel) {
+function replyFor(channel: Channel, locale: Locale) {
+  const copy = publicText[locale].contact;
   switch (channel) {
     case "email":
       return {
-        message: "Perfect. Write whenever you like — I read every message with care.",
-        actionLabel: "Open email",
-        actionHref: `mailto:${CONTACTS.email}?subject=Hello%20IkKOA%20Studio`,
-        detail: CONTACTS.email,
+        message: copy.emailMessage,
+        actionLabel: copy.emailAction,
+        actionHref: `mailto:${STUDIO_CONTACTS.email}?subject=Hello%20IkKOA%20Studio`,
+        detail: STUDIO_CONTACTS.email,
       };
     case "whatsapp":
       return {
-        message:
-          "Great. Let's talk on WhatsApp — reply whenever it works for you.",
-        actionLabel: "Open WhatsApp",
-        actionHref: `https://wa.me/${CONTACTS.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hello IkKOA Studio, I'd like to get in touch.")}`,
-        detail: CONTACTS.whatsappDisplay,
+        message: copy.whatsappMessage,
+        actionLabel: copy.whatsappAction,
+        actionHref: whatsappUrl(
+          locale === "es"
+            ? "Hola IkKOA Studio, me gustaría comunicarme contigo."
+            : "Hello IkKOA Studio, I'd like to get in touch.",
+        ),
+        detail: STUDIO_CONTACTS.whatsappDisplay,
       };
     case "social":
       return {
-        message:
-          "Love that. Follow or message me on Instagram — that's where we share the process.",
-        actionLabel: "Open Instagram",
-        actionHref: CONTACTS.instagramUrl,
-        detail: `@${CONTACTS.instagram}`,
+        message: copy.socialMessage,
+        actionLabel: copy.socialAction,
+        actionHref: STUDIO_CONTACTS.instagramUrl,
+        detail: `@${STUDIO_CONTACTS.instagram}`,
       };
   }
 }
 
-export default function SayHello() {
+export default function SayHello({ locale = "en" }: { locale?: Locale }) {
   const [channel, setChannel] = useState<Channel | null>(null);
-  const reply = channel ? replyFor(channel) : null;
+  const copy = publicText[locale].contact;
+  const options: { id: Channel; label: string }[] = [
+    { id: "email", label: "Email" },
+    { id: "whatsapp", label: "WhatsApp" },
+    { id: "social", label: copy.social },
+  ];
+  const reply = channel ? replyFor(channel, locale) : null;
   const selectedLabel = options.find((o) => o.id === channel)?.label;
 
   return (
@@ -56,10 +53,10 @@ export default function SayHello() {
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
         <div className="mb-12 text-center sm:mb-16">
           <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.28em] text-muted">
-            Say Hello
+            {copy.eyebrow}
           </p>
           <h2 className="font-[family-name:var(--font-title)] text-4xl font-semibold leading-none tracking-tight text-ink sm:text-6xl">
-            Let&apos;s talk
+            {copy.title}
           </h2>
         </div>
 
@@ -72,13 +69,13 @@ export default function SayHello() {
               <p className="font-[family-name:var(--font-nav)] text-sm uppercase tracking-wide text-ink">
                 IkKOA Studio
               </p>
-              <p className="text-[11px] text-muted">Online · replies directly</p>
+              <p className="text-[11px] text-muted">{copy.online}</p>
             </div>
           </div>
 
           <div className="flex min-h-[20rem] flex-col gap-4 sm:min-h-[22rem]">
             <div className="max-w-[min(90%,36rem)] animate-fade-up self-start rounded-2xl rounded-tl-sm bg-background px-4 py-3 text-sm leading-relaxed text-ink sm:px-5 sm:py-4 sm:text-base">
-              Hi. How would you like to get in touch?
+              {copy.question}
             </div>
 
             {!channel && (
@@ -125,7 +122,7 @@ export default function SayHello() {
                       onClick={() => setChannel(null)}
                       className="font-[family-name:var(--font-nav)] text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-ink"
                     >
-                      Choose another option
+                      {copy.chooseAnother}
                     </button>
                   </div>
                 </div>

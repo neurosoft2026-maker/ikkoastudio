@@ -1,3 +1,5 @@
+import { publicText, type Locale } from "@/lib/locale";
+
 const socials = [
   {
     name: "Instagram",
@@ -47,14 +49,14 @@ const socials = [
   },
 ];
 
-export default function Footer() {
+export default function Footer({ locale = "en" }: { locale?: Locale }) {
   const year = new Date().getFullYear();
 
   return (
     <footer className="border-t border-line py-10">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-5 sm:flex-row sm:px-8">
         <p className="text-[11px] uppercase tracking-[0.18em] text-muted">
-          © {year} IkKOA STUDIO · All rights reserved
+          © {year} IkKOA STUDIO · {publicText[locale].footer}
         </p>
 
         <div className="flex items-center gap-5">
