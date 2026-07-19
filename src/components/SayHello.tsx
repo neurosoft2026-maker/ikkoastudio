@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { STUDIO_CONTACTS, whatsappUrl } from "@/lib/contacts";
 import { publicText, type Locale } from "@/lib/locale";
@@ -62,12 +63,19 @@ export default function SayHello({ locale = "en" }: { locale?: Locale }) {
 
         <div className="min-h-[28rem] border border-line bg-white p-5 sm:min-h-[32rem] sm:p-10 lg:p-12">
           <div className="mb-8 flex items-center gap-3 border-b border-line pb-5">
-            <span className="flex h-9 w-9 items-center justify-center bg-ink font-[family-name:var(--font-nav)] text-[10px] uppercase tracking-wider text-white">
-              IK
+            <span className="relative h-10 w-10 shrink-0 overflow-hidden bg-ink/5">
+              <Image
+                src="/img/avatar.PNG"
+                alt="Gustavo Moreno"
+                fill
+                className="object-cover"
+                sizes="40px"
+                unoptimized
+              />
             </span>
             <div>
               <p className="font-[family-name:var(--font-nav)] text-sm uppercase tracking-wide text-ink">
-                IkKOA Studio
+                Gustavo Moreno
               </p>
               <p className="text-[11px] text-muted">{copy.online}</p>
             </div>

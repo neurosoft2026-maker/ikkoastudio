@@ -3,7 +3,7 @@ export const STUDIO_CONTACTS = {
   whatsapp: "+573001486762",
   whatsappDisplay: "+57 300 148 6762",
   instagram: "ikkoastudio",
-  instagramUrl: "https://instagram.com/ikkoastudio",
+  instagramUrl: "https://www.instagram.com/ikkoastudio",
 } as const;
 
 export function whatsappUrl(message: string) {

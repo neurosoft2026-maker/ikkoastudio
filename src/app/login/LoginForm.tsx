@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import Logo from "@/components/Logo";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginForm() {
@@ -40,20 +42,28 @@ export default function LoginForm() {
   return (
     <main className="flex min-h-svh items-center justify-center bg-background px-5">
       <div className="w-full max-w-md border border-line bg-white p-8 sm:p-10">
+        <Link
+          href="/"
+          aria-label="IkKOA STUDIO — Home"
+          className="mb-8 flex justify-center"
+        >
+          <Logo priority className="h-16 w-auto sm:h-20" />
+        </Link>
+
         <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.28em] text-muted">
-          Admin
+          Administración
         </p>
         <h1 className="font-[family-name:var(--font-title)] text-3xl font-semibold text-ink">
-          Sign in
+          Iniciar sesión
         </h1>
         <p className="mt-3 text-sm text-muted">
-          Access the IkKOA Studio dashboard to manage categories and artworks.
+          Accede al panel de IkKOA Studio para gestionar categorías y obras.
         </p>
 
         <form onSubmit={onSubmit} className="mt-8 space-y-6">
           <label className="block">
             <span className="mb-2 block text-[11px] uppercase tracking-[0.18em] text-muted">
-              Email
+              Correo electrónico
             </span>
             <input
               type="email"
@@ -67,7 +77,7 @@ export default function LoginForm() {
 
           <div>
             <span className="mb-2 block text-[11px] uppercase tracking-[0.18em] text-muted">
-              Password
+              Contraseña
             </span>
             <div className="relative">
               <input
@@ -81,7 +91,9 @@ export default function LoginForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
                 className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-ink/60 transition-colors hover:text-ink"
               >
                 {showPassword ? (
@@ -126,9 +138,16 @@ export default function LoginForm() {
             disabled={loading}
             className="inline-flex h-12 w-full items-center justify-center bg-ink font-[family-name:var(--font-nav)] text-[11px] uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-80 disabled:opacity-50"
           >
-            {loading ? "Signing in…" : "Sign in"}
+            {loading ? "Ingresando…" : "Ingresar"}
           </button>
         </form>
+
+        <Link
+          href="/"
+          className="mt-8 flex items-center justify-center gap-2 font-[family-name:var(--font-nav)] text-[11px] uppercase tracking-[0.16em] text-muted transition-colors hover:text-ink"
+        >
+          ← Volver al sitio
+        </Link>
       </div>
     </main>
   );
