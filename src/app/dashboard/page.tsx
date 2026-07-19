@@ -4,11 +4,17 @@ import { createClient } from "@/lib/supabase/server";
 export default async function DashboardPage() {
   const supabase = await createClient();
 
-  const [{ count: categoriesCount }, { count: artworksCount }] =
-    await Promise.all([
-      supabase.from("categories").select("*", { count: "exact", head: true }),
-      supabase.from("artworks").select("*", { count: "exact", head: true }),
-    ]);
+  const [
+    { count: categoriesCount },
+    { count: artworksCount },
+    { count: journalCount },
+  ] = await Promise.all([
+    supabase.from("categories").select("*", { count: "exact", head: true }),
+    supabase.from("artworks").select("*", { count: "exact", head: true }),
+    supabase
+      .from("studio_journal_videos")
+      .select("*", { count: "exact", head: true }),
+  ]);
 
   return (
     <div>
@@ -16,10 +22,10 @@ export default async function DashboardPage() {
         Resumen
       </h1>
       <p className="mt-3 text-muted">
-        Administra las categorías y las obras de tu colección.
+        Administra las categorías, las obras y Studio Journal.
       </p>
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2">
+      <div className="mt-10 grid gap-4 sm:grid-cols-3">
         <Link
           href="/dashboard/categories"
           className="border border-line bg-white p-6 transition-colors hover:border-ink"
@@ -42,6 +48,17 @@ export default async function DashboardPage() {
             {artworksCount ?? 0}
           </p>
         </Link>
+        <Link
+          href="/dashboard/studio-journal"
+          className="border border-line bg-white p-6 transition-colors hover:border-ink"
+        >
+          <p className="text-[11px] uppercase tracking-[0.18em] text-muted">
+            Studio Journal
+          </p>
+          <p className="mt-3 font-[family-name:var(--font-title)] text-4xl font-semibold text-ink">
+            {journalCount ?? 0}
+          </p>
+        </Link>
       </div>
 
       <div className="mt-10 flex flex-wrap gap-3">
@@ -56,6 +73,12 @@ export default async function DashboardPage() {
           className="inline-flex h-11 items-center border border-ink px-5 font-[family-name:var(--font-nav)] text-[11px] uppercase tracking-[0.16em] text-ink"
         >
           Nueva obra
+        </Link>
+        <Link
+          href="/dashboard/studio-journal"
+          className="inline-flex h-11 items-center border border-ink px-5 font-[family-name:var(--font-nav)] text-[11px] uppercase tracking-[0.16em] text-ink"
+        >
+          Studio Journal
         </Link>
       </div>
     </div>

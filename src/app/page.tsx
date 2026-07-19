@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import MaintenanceView from "@/components/MaintenanceView";
 import SayHello from "@/components/SayHello";
+import StudioJournal from "@/components/StudioJournal";
 import VisualStories from "@/components/VisualStories";
 import { getLocale } from "@/lib/locale-server";
 import { getSiteContent } from "@/lib/site-content";
@@ -26,6 +27,7 @@ export default async function Home() {
       <Header locale={locale} />
       <main>
         <Hero content={content[locale].hero} />
+        <StudioJournal locale={locale} />
         <VisualStories locale={locale} />
         <Expressions content={content[locale].expressions} />
         <BehindCanvas content={content[locale].behind} locale={locale} />

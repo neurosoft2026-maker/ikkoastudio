@@ -4,6 +4,7 @@ export const publicText = {
   en: {
     nav: {
       home: "Home",
+      journal: "Studio Journal",
       stories: "Visual Stories",
       expressions: "Expressions",
       behind: "Behind the Canvas",
@@ -11,6 +12,12 @@ export const publicText = {
       login: "Login",
       openMenu: "Open menu",
       closeMenu: "Close menu",
+    },
+    journal: {
+      title: "Studio notes",
+      description:
+        "Vertical glimpses from the studio — process, texture, and the quiet rhythm of making.",
+      comingSoon: "Coming soon",
     },
     stories: {
       title: "Celebrities",
@@ -75,6 +82,7 @@ export const publicText = {
   es: {
     nav: {
       home: "Inicio",
+      journal: "Studio Journal",
       stories: "Historias Visuales",
       expressions: "Expresiones",
       behind: "Detrás del Lienzo",
@@ -82,6 +90,12 @@ export const publicText = {
       login: "Ingresar",
       openMenu: "Abrir menú",
       closeMenu: "Cerrar menú",
+    },
+    journal: {
+      title: "Notas del estudio",
+      description:
+        "Instantáneas verticales del estudio: proceso, textura y el ritmo callado de crear.",
+      comingSoon: "Próximamente",
     },
     stories: {
       title: "Celebridades",

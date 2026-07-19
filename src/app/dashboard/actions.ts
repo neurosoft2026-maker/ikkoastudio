@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/types";
+import { getYouTubeVideoId } from "@/lib/youtube";
 
 export async function createCategory(formData: FormData): Promise<void> {
   const name = String(formData.get("name") || "").trim();
@@ -342,4 +343,99 @@ function printFieldsFromForm(formData: FormData) {
       ? emptyToNull(formData.get("print_dimensions"))
       : null,
   };
+}
+
+function parseStudioJournalPayload(formData: FormData) {
+  const title = String(formData.get("title") || "").trim();
+  const youtubeUrl = String(formData.get("youtube_url") || "").trim();
+  const sortOrder = Number(formData.get("sort_order") || 0);
+
+  if (!title) return { error: "El título es obligatorio" };
+  if (!getYouTubeVideoId(youtubeUrl)) {
+    return {
+      error:
+        "La URL del video no es válida. Usa un enlace de YouTube (incluye Shorts).",
+    };
+  }
+
+  return {
+    payload: {
+      title,
+      youtube_url: youtubeUrl,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+    },
+  };
+}
+
+function isMissingStudioJournalTable(message?: string, code?: string) {
+  return (
+    code === "PGRST205" ||
+    Boolean(
+      message &&
+        (message.includes("studio_journal_videos") ||
+          message.includes("schema cache") ||
+          message.includes("Could not find the table")),
+    )
+  );
+}
+
+export async function createStudioJournalVideo(formData: FormData) {
+  const parsed = parseStudioJournalPayload(formData);
+  if ("error" in parsed && parsed.error) return { error: parsed.error };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("studio_journal_videos")
+    .insert(parsed.payload!);
+
+  if (error) {
+    if (isMissingStudioJournalTable(error.message, error.code)) {
+      return {
+        error:
+          "La tabla studio_journal_videos no existe. Ejecuta supabase/migration_studio_journal.sql en el SQL Editor de Supabase.",
+      };
+    }
+    return { error: error.message };
+  }
+
+  revalidatePath("/dashboard/studio-journal");
+  revalidatePath("/");
+}
+
+export async function updateStudioJournalVideo(formData: FormData) {
+  const id = String(formData.get("id") || "");
+  if (!id) return { error: "Missing id" };
+
+  const parsed = parseStudioJournalPayload(formData);
+  if ("error" in parsed && parsed.error) return { error: parsed.error };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("studio_journal_videos")
+    .update(parsed.payload!)
+    .eq("id", id);
+
+  if (error) {
+    if (isMissingStudioJournalTable(error.message, error.code)) {
+      return {
+        error:
+          "La tabla studio_journal_videos no existe. Ejecuta supabase/migration_studio_journal.sql en el SQL Editor de Supabase.",
+      };
+    }
+    return { error: error.message };
+  }
+
+  revalidatePath("/dashboard/studio-journal");
+  revalidatePath("/");
+}
+
+export async function deleteStudioJournalVideo(formData: FormData): Promise<void> {
+  const id = String(formData.get("id") || "");
+  if (!id) return;
+
+  const supabase = await createClient();
+  await supabase.from("studio_journal_videos").delete().eq("id", id);
+
+  revalidatePath("/dashboard/studio-journal");
+  revalidatePath("/");
 }

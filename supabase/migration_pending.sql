@@ -4,6 +4,7 @@
 -- Incluye:
 -- 1) Columnas de nombre/título en inglés (categorías y obras)
 -- 2) Tabla site_content + bucket site-media (textos, video e imagen del home)
+-- 3) Tabla studio_journal_videos (videos verticales tipo Reel)
 
 -- ============================================================
 -- 1. Nombres en inglés
@@ -73,3 +74,30 @@ create policy "Authenticated can delete site media"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'site-media');
+
+-- ============================================================
+-- 3. Studio Journal (videos verticales de YouTube)
+-- ============================================================
+
+create table if not exists public.studio_journal_videos (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  youtube_url text not null,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table public.studio_journal_videos enable row level security;
+
+drop policy if exists "Public can read studio journal videos" on public.studio_journal_videos;
+create policy "Public can read studio journal videos"
+  on public.studio_journal_videos for select
+  to anon, authenticated
+  using (true);
+
+drop policy if exists "Authenticated can manage studio journal videos" on public.studio_journal_videos;
+create policy "Authenticated can manage studio journal videos"
+  on public.studio_journal_videos for all
+  to authenticated
+  using (true)
+  with check (true);

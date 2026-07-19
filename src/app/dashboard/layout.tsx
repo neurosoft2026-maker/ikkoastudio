@@ -28,6 +28,7 @@ export default async function DashboardLayout({
     { href: "/dashboard", label: "Resumen" },
     { href: "/dashboard/categories", label: "Categorías" },
     { href: "/dashboard/artworks", label: "Obras" },
+    { href: "/dashboard/studio-journal", label: "Studio Journal" },
     { href: "/dashboard/content", label: "Contenido del sitio" },
   ];
 

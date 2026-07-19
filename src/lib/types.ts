@@ -6,6 +6,14 @@ export type Category = {
   created_at: string;
 };
 
+export type StudioJournalVideo = {
+  id: string;
+  title: string;
+  youtube_url: string;
+  sort_order: number;
+  created_at: string;
+};
+
 export type Artwork = {
   id: string;
   category_id: string | null;

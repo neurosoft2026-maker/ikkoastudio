@@ -10,6 +10,7 @@ export default function Header({ locale = "en" }: { locale?: Locale }) {
   const copy = publicText[locale].nav;
   const navItems = [
     { label: copy.home, href: "/#home" },
+    { label: copy.journal, href: "/#studio-journal" },
     { label: copy.stories, href: "/#visual-stories" },
     { label: copy.expressions, href: "/#expressions" },
     { label: copy.behind, href: "/#behind-the-canvas" },
