@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { slugify, type Artwork, type Category } from "@/lib/types";
 import { createArtwork, updateArtwork } from "@/app/dashboard/actions";
+import { uploadFileToBucket } from "@/lib/storage-client";
 
 type Props = {
   categories: Category[];
@@ -425,6 +426,24 @@ export default function ArtworkForm({ categories, artwork }: Props) {
   async function action(formData: FormData) {
     setError(null);
     formData.set("artwork_code", artworkCode);
+
+    // La imagen se sube directo del navegador a Supabase Storage para
+    // evitar el límite de 4.5 MB de las peticiones al servidor en Vercel.
+    const imageFile = formData.get("image") as File | null;
+    if (imageFile && imageFile.size > 0) {
+      const upload = await uploadFileToBucket(
+        "artworks",
+        imageFile,
+        slugify(title.trim() || "artwork"),
+      );
+      if (upload.error || !upload.url) {
+        setError(`No se pudo subir la imagen: ${upload.error}`);
+        return;
+      }
+      formData.set("image_url", upload.url);
+    }
+    formData.delete("image");
+
     const result = isEdit
       ? await updateArtwork(formData)
       : await createArtwork(formData);

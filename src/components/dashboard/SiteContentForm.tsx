@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { updateSiteContent } from "@/app/dashboard/content-actions";
+import { uploadFileToBucket } from "@/lib/storage-client";
 import type {
   LocalizedSiteContent,
   SiteContent,
@@ -185,6 +186,42 @@ export default function SiteContentForm({
     setPending(true);
     setStatus(null);
     try {
+      // Los archivos se suben directo del navegador a Supabase Storage.
+      // Vercel limita las peticiones al servidor a 4.5 MB, así que no se
+      // pueden enviar videos/imágenes grandes dentro del formulario.
+      const videoFile = formData.get("hero_video_file") as File | null;
+      if (videoFile && videoFile.size > 0) {
+        setStatus("Subiendo video…");
+        const upload = await uploadFileToBucket(
+          "site-media",
+          videoFile,
+          "hero-video",
+        );
+        if (upload.error || !upload.url) {
+          setStatus(`No se pudo subir el video: ${upload.error}`);
+          return;
+        }
+        formData.set("hero_video_url", upload.url);
+      }
+      formData.delete("hero_video_file");
+
+      const imageFile = formData.get("behind_image_file") as File | null;
+      if (imageFile && imageFile.size > 0) {
+        setStatus("Subiendo imagen…");
+        const upload = await uploadFileToBucket(
+          "site-media",
+          imageFile,
+          "behind-image",
+        );
+        if (upload.error || !upload.url) {
+          setStatus(`No se pudo subir la imagen: ${upload.error}`);
+          return;
+        }
+        formData.set("behind_image_url", upload.url);
+      }
+      formData.delete("behind_image_file");
+
+      setStatus("Guardando…");
       const result = await updateSiteContent(formData);
       setStatus(
         result.error
