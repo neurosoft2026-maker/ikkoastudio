@@ -20,9 +20,22 @@ async function readLocalContent(): Promise<LocalizedSiteContent> {
   }
 }
 
-async function writeLocalContent(content: LocalizedSiteContent) {
-  await fs.mkdir(path.dirname(localContentPath), { recursive: true });
-  await fs.writeFile(localContentPath, JSON.stringify(content, null, 2), "utf8");
+// Caché local best-effort: en Vercel el filesystem es de solo lectura,
+// por lo que este write puede fallar y nunca debe romper la petición.
+async function writeLocalContent(
+  content: LocalizedSiteContent,
+): Promise<boolean> {
+  try {
+    await fs.mkdir(path.dirname(localContentPath), { recursive: true });
+    await fs.writeFile(
+      localContentPath,
+      JSON.stringify(content, null, 2),
+      "utf8",
+    );
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function isMissingTableError(message?: string) {
@@ -69,6 +82,7 @@ export async function saveSiteContent(
   usedLocalFallback?: true;
 }> {
   const merged = mergeSiteContent(content);
+  let supabaseError: string | undefined;
 
   try {
     const supabase = await createClient();
@@ -83,14 +97,22 @@ export async function saveSiteContent(
       return { success: true };
     }
 
-    if (!isMissingTableError(error.message) && error.code !== "PGRST205") {
-      await writeLocalContent(merged);
-      return { error: error.message, usedLocalFallback: true };
+    if (isMissingTableError(error.message) || error.code === "PGRST205") {
+      supabaseError =
+        "La tabla site_content no existe en Supabase. Ejecuta supabase/migration_pending.sql en el SQL Editor.";
+    } else {
+      supabaseError = error.message;
     }
-  } catch {
-    // fall through to local
+  } catch (err) {
+    supabaseError = err instanceof Error ? err.message : String(err);
   }
 
-  await writeLocalContent(merged);
-  return { success: true, usedLocalFallback: true };
+  const wroteLocal = await writeLocalContent(merged);
+  if (wroteLocal) {
+    return { error: supabaseError, usedLocalFallback: true };
+  }
+  return {
+    error:
+      supabaseError ?? "No se pudo guardar el contenido en ningún destino.",
+  };
 }
