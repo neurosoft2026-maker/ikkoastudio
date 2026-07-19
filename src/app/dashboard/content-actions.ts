@@ -111,7 +111,7 @@ function localeContent(
 
 export async function updateSiteContent(formData: FormData) {
   const current = await getSiteContent();
-  let videoUrl = value(
+  const videoUrl = value(
     formData,
     "hero_video_url",
     current.en.hero.videoUrl || DEFAULT_SITE_CONTENT.en.hero.videoUrl,
@@ -122,12 +122,7 @@ export async function updateSiteContent(formData: FormData) {
     current.en.behind.imageUrl || DEFAULT_SITE_CONTENT.en.behind.imageUrl,
   );
 
-  const videoFile = formData.get("hero_video_file") as File | null;
   const imageFile = formData.get("behind_image_file") as File | null;
-  if (videoFile?.size) {
-    videoUrl =
-      (await uploadSiteFile(videoFile, "hero-video")) || videoUrl;
-  }
   if (imageFile?.size) {
     imageUrl =
       (await uploadSiteFile(imageFile, "behind-image")) || imageUrl;

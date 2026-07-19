@@ -34,3 +34,25 @@ export function getYouTubeEmbedUrl(url: string | null | undefined): string | nul
   const id = getYouTubeVideoId(url);
   return id ? `https://www.youtube.com/embed/${id}` : null;
 }
+
+/** YouTube embed configured as a silent, looping decorative background. */
+export function getYouTubeBackgroundUrl(
+  url: string | null | undefined,
+): string | null {
+  const id = getYouTubeVideoId(url);
+  if (!id) return null;
+
+  const params = new URLSearchParams({
+    autoplay: "1",
+    mute: "1",
+    controls: "0",
+    loop: "1",
+    playlist: id,
+    playsinline: "1",
+    rel: "0",
+    disablekb: "1",
+    fs: "0",
+  });
+
+  return `https://www.youtube.com/embed/${id}?${params.toString()}`;
+}

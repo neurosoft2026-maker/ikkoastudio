@@ -1,28 +1,43 @@
 import type { SiteContent } from "@/lib/site-content-types";
+import { getYouTubeBackgroundUrl } from "@/lib/youtube";
 
 type Props = {
   content: SiteContent["hero"];
 };
 
 export default function Hero({ content }: Props) {
+  const youtubeBackground = getYouTubeBackgroundUrl(content.videoUrl);
+
   return (
     <section
       id="home"
       className="grain relative flex min-h-[100svh] flex-col justify-end overflow-hidden"
     >
       <div className="absolute inset-0 animate-reveal">
-        <video
-          key={content.videoUrl}
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden
-        >
-          <source src={content.videoUrl} type="video/mp4" />
-        </video>
+        {youtubeBackground ? (
+          <iframe
+            key={youtubeBackground}
+            src={youtubeBackground}
+            title="IkKOA Studio background video"
+            aria-hidden
+            tabIndex={-1}
+            allow="autoplay; encrypted-media"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full max-w-none -translate-x-1/2 -translate-y-1/2 border-0"
+          />
+        ) : (
+          <video
+            key={content.videoUrl}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden
+          >
+            <source src={content.videoUrl} />
+          </video>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/25 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/45 via-transparent to-transparent" />
       </div>

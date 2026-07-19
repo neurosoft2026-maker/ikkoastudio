@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { updateSiteContent } from "@/app/dashboard/content-actions";
 import { uploadFileToBucket } from "@/lib/storage-client";
+import { getYouTubeVideoId } from "@/lib/youtube";
 import type {
   LocalizedSiteContent,
   SiteContent,
@@ -186,25 +187,16 @@ export default function SiteContentForm({
     setPending(true);
     setStatus(null);
     try {
-      // Los archivos se suben directo del navegador a Supabase Storage.
-      // Vercel limita las peticiones al servidor a 4.5 MB, así que no se
-      // pueden enviar videos/imágenes grandes dentro del formulario.
-      const videoFile = formData.get("hero_video_file") as File | null;
-      if (videoFile && videoFile.size > 0) {
-        setStatus("Subiendo video…");
-        const upload = await uploadFileToBucket(
-          "site-media",
-          videoFile,
-          "hero-video",
+      const videoUrl = String(formData.get("hero_video_url") || "").trim();
+      if (!getYouTubeVideoId(videoUrl)) {
+        setStatus(
+          "La URL del video no es válida. Usa un enlace de YouTube como https://youtu.be/VIDEO_ID.",
         );
-        if (upload.error || !upload.url) {
-          setStatus(`No se pudo subir el video: ${upload.error}`);
-          return;
-        }
-        formData.set("hero_video_url", upload.url);
+        return;
       }
-      formData.delete("hero_video_file");
 
+      // La imagen se sube directamente a Supabase Storage para no enviarla
+      // por la función de Vercel, cuyo cuerpo está limitado a 4.5 MB.
       const imageFile = formData.get("behind_image_file") as File | null;
       if (imageFile && imageFile.size > 0) {
         setStatus("Subiendo imagen…");
@@ -240,23 +232,14 @@ export default function SiteContentForm({
           Recursos compartidos
         </h2>
         <div className="grid gap-6 sm:grid-cols-2">
-          <Field
-            name="hero_video_url"
-            label="URL del video de fondo"
-            defaultValue={initial.en.hero.videoUrl}
-            hint="Puedes usar una ruta local o una URL pública."
-          />
-          <label className="block">
-            <span className="mb-2 block text-[11px] uppercase tracking-[0.18em] text-muted">
-              Subir nuevo video
-            </span>
-            <input
-              type="file"
-              name="hero_video_file"
-              accept="video/mp4,video/webm,video/*"
-              className="w-full text-sm"
+          <div className="sm:col-span-2">
+            <Field
+              name="hero_video_url"
+              label="URL de YouTube para el video de fondo"
+              defaultValue={initial.en.hero.videoUrl}
+              hint="Pega una URL de YouTube. El video se mostrará sin sonido, sin controles y en reproducción automática."
             />
-          </label>
+          </div>
           <Field
             name="behind_image_url"
             label="URL de la imagen del estudio"
